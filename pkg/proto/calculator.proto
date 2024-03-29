@@ -1,0 +1,35 @@
+syntax = "proto3";
+
+package calculator;
+
+option go_package = "github.com/AskarKasimov/grpc-calculator;calculatorpc";
+
+message Expression {
+   string id = 1;
+   string vanilla = 2;
+   string answer = 3;
+   string progress = 4;
+   string incomingDate = 5;
+}
+
+message CreateExpressionRequest {
+   string vanilla = 1;
+}
+
+message CreateExpressionResponse {
+   Expression expression = 1;
+}
+
+message RegisterRequest {
+   string name = 1;
+}
+
+message RegisterResponse {
+   string id = 1;
+}
+
+
+service ExpressionService {
+   rpc Register (RegisterRequest) returns (RegisterResponse);
+   rpc CreateExpression (CreateExpressionRequest) returns (CreateExpressionResponse);  
+}
