@@ -1,0 +1,11 @@
+FROM golang:alpine AS builder
+WORKDIR /app
+COPY / ./
+RUN go build -o ./bin/server ./cmd/server/server.go
+
+FROM alpine
+WORKDIR /app
+COPY --from=builder /app/bin/server ./bin/server
+EXPOSE 8080
+EXPOSE 50051
+CMD ["./bin/server"]

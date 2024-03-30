@@ -1,8 +1,24 @@
 syntax = "proto3";
 
-package calculator;
+package calculatorpc;
 
-option go_package = "github.com/AskarKasimov/grpc-calculator;calculatorpc";
+import "google/api/annotations.proto";
+
+option go_package = "/pkg/proto";
+
+service ExpressionService {
+   rpc Register (RegisterRequest) returns (RegisterResponse) {
+      option (google.api.http) = {
+         post: "/api/v1/worker/register"
+     };
+   };
+   rpc CreateExpression (CreateExpressionRequest) returns (CreateExpressionResponse)
+   {
+      option (google.api.http) = {
+         post: "/api/v1/expression/add"
+     };
+   };  
+}
 
 message Expression {
    string id = 1;
@@ -26,10 +42,4 @@ message RegisterRequest {
 
 message RegisterResponse {
    string id = 1;
-}
-
-
-service ExpressionService {
-   rpc Register (RegisterRequest) returns (RegisterResponse);
-   rpc CreateExpression (CreateExpressionRequest) returns (CreateExpressionResponse);  
 }

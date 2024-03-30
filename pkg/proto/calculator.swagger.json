@@ -1,0 +1,146 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "pkg/proto/calculator.proto",
+    "version": "version not set"
+  },
+  "tags": [
+    {
+      "name": "ExpressionService"
+    }
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {
+    "/api/v1/expression/add": {
+      "post": {
+        "operationId": "ExpressionService_CreateExpression",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/calculatorpcCreateExpressionResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "vanilla",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "ExpressionService"
+        ]
+      }
+    },
+    "/api/v1/worker/register": {
+      "post": {
+        "operationId": "ExpressionService_Register",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/calculatorpcRegisterResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "name",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "ExpressionService"
+        ]
+      }
+    }
+  },
+  "definitions": {
+    "calculatorpcCreateExpressionResponse": {
+      "type": "object",
+      "properties": {
+        "expression": {
+          "$ref": "#/definitions/calculatorpcExpression"
+        }
+      }
+    },
+    "calculatorpcExpression": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "vanilla": {
+          "type": "string"
+        },
+        "answer": {
+          "type": "string"
+        },
+        "progress": {
+          "type": "string"
+        },
+        "incomingDate": {
+          "type": "string"
+        }
+      }
+    },
+    "calculatorpcRegisterResponse": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        }
+      }
+    },
+    "protobufAny": {
+      "type": "object",
+      "properties": {
+        "@type": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": {}
+    },
+    "rpcStatus": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "message": {
+          "type": "string"
+        },
+        "details": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/protobufAny"
+          }
+        }
+      }
+    }
+  }
+}

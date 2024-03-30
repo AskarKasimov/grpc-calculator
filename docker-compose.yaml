@@ -1,0 +1,40 @@
+version: '3.8'
+services:
+    postgres:
+        image: postgres
+        environment:
+            - POSTGRES_DB=yg
+            - POSTGRES_USER=admin
+            - POSTGRES_PASSWORD=admin
+        volumes:
+            - ./init-sql:/docker-entrypoint-initdb.d
+        ports:
+            - "5432:5432"
+    server:
+        build:
+            context: ./
+            dockerfile: Dockerfile.server
+        restart: on-failure
+        ports:
+            - "50051:50051" # port for gRPC
+            - "8080:8080" # port for HTTP
+        depends_on:
+            - postgres
+    client:
+        build:
+            context: ./
+            dockerfile: Dockerfile.client
+        deploy:
+            mode: replicated
+            replicas: 1 # number of clients to launch
+        environment:
+            - HOST=server
+            - PORT=50051
+            - MULTIPLICATION=1
+            - DIVISION=1
+            - ADDITION=1
+            - SUBTRACTION=1
+            - GOROUTINES=5
+        restart: on-failure
+        depends_on:
+            - server

@@ -4,7 +4,7 @@
 // - protoc             v3.21.12
 // source: pkg/proto/calculator.proto
 
-package calculatorpc
+package proto
 
 import (
 	context "context"
@@ -19,8 +19,8 @@ import (
 const _ = grpc.SupportPackageIsVersion7
 
 const (
-	ExpressionService_Register_FullMethodName         = "/calculator.ExpressionService/Register"
-	ExpressionService_CreateExpression_FullMethodName = "/calculator.ExpressionService/CreateExpression"
+	ExpressionService_Register_FullMethodName         = "/calculatorpc.ExpressionService/Register"
+	ExpressionService_CreateExpression_FullMethodName = "/calculatorpc.ExpressionService/CreateExpression"
 )
 
 // ExpressionServiceClient is the client API for ExpressionService service.
@@ -129,7 +129,7 @@ func _ExpressionService_CreateExpression_Handler(srv interface{}, ctx context.Co
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
 var ExpressionService_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "calculator.ExpressionService",
+	ServiceName: "calculatorpc.ExpressionService",
 	HandlerType: (*ExpressionServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
