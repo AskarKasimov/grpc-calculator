@@ -19,8 +19,9 @@ import (
 const _ = grpc.SupportPackageIsVersion7
 
 const (
-	ExpressionService_Register_FullMethodName         = "/calculatorpc.ExpressionService/Register"
-	ExpressionService_CreateExpression_FullMethodName = "/calculatorpc.ExpressionService/CreateExpression"
+	ExpressionService_Register_FullMethodName                    = "/calculatorpc.ExpressionService/Register"
+	ExpressionService_CreateExpression_FullMethodName            = "/calculatorpc.ExpressionService/CreateExpression"
+	ExpressionService_StreamExpressionsFromServer_FullMethodName = "/calculatorpc.ExpressionService/StreamExpressionsFromServer"
 )
 
 // ExpressionServiceClient is the client API for ExpressionService service.
@@ -29,6 +30,7 @@ const (
 type ExpressionServiceClient interface {
 	Register(ctx context.Context, in *RegisterRequest, opts ...grpc.CallOption) (*RegisterResponse, error)
 	CreateExpression(ctx context.Context, in *CreateExpressionRequest, opts ...grpc.CallOption) (*CreateExpressionResponse, error)
+	StreamExpressionsFromServer(ctx context.Context, in *ClientAuth, opts ...grpc.CallOption) (ExpressionService_StreamExpressionsFromServerClient, error)
 }
 
 type expressionServiceClient struct {
@@ -57,12 +59,45 @@ func (c *expressionServiceClient) CreateExpression(ctx context.Context, in *Crea
 	return out, nil
 }
 
+func (c *expressionServiceClient) StreamExpressionsFromServer(ctx context.Context, in *ClientAuth, opts ...grpc.CallOption) (ExpressionService_StreamExpressionsFromServerClient, error) {
+	stream, err := c.cc.NewStream(ctx, &ExpressionService_ServiceDesc.Streams[0], ExpressionService_StreamExpressionsFromServer_FullMethodName, opts...)
+	if err != nil {
+		return nil, err
+	}
+	x := &expressionServiceStreamExpressionsFromServerClient{stream}
+	if err := x.ClientStream.SendMsg(in); err != nil {
+		return nil, err
+	}
+	if err := x.ClientStream.CloseSend(); err != nil {
+		return nil, err
+	}
+	return x, nil
+}
+
+type ExpressionService_StreamExpressionsFromServerClient interface {
+	Recv() (*ExpressionToSolve, error)
+	grpc.ClientStream
+}
+
+type expressionServiceStreamExpressionsFromServerClient struct {
+	grpc.ClientStream
+}
+
+func (x *expressionServiceStreamExpressionsFromServerClient) Recv() (*ExpressionToSolve, error) {
+	m := new(ExpressionToSolve)
+	if err := x.ClientStream.RecvMsg(m); err != nil {
+		return nil, err
+	}
+	return m, nil
+}
+
 // ExpressionServiceServer is the server API for ExpressionService service.
 // All implementations must embed UnimplementedExpressionServiceServer
 // for forward compatibility
 type ExpressionServiceServer interface {
 	Register(context.Context, *RegisterRequest) (*RegisterResponse, error)
 	CreateExpression(context.Context, *CreateExpressionRequest) (*CreateExpressionResponse, error)
+	StreamExpressionsFromServer(*ClientAuth, ExpressionService_StreamExpressionsFromServerServer) error
 	mustEmbedUnimplementedExpressionServiceServer()
 }
 
@@ -75,6 +110,9 @@ func (UnimplementedExpressionServiceServer) Register(context.Context, *RegisterR
 }
 func (UnimplementedExpressionServiceServer) CreateExpression(context.Context, *CreateExpressionRequest) (*CreateExpressionResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CreateExpression not implemented")
+}
+func (UnimplementedExpressionServiceServer) StreamExpressionsFromServer(*ClientAuth, ExpressionService_StreamExpressionsFromServerServer) error {
+	return status.Errorf(codes.Unimplemented, "method StreamExpressionsFromServer not implemented")
 }
 func (UnimplementedExpressionServiceServer) mustEmbedUnimplementedExpressionServiceServer() {}
 
@@ -125,6 +163,27 @@ func _ExpressionService_CreateExpression_Handler(srv interface{}, ctx context.Co
 	return interceptor(ctx, in, info, handler)
 }
 
+func _ExpressionService_StreamExpressionsFromServer_Handler(srv interface{}, stream grpc.ServerStream) error {
+	m := new(ClientAuth)
+	if err := stream.RecvMsg(m); err != nil {
+		return err
+	}
+	return srv.(ExpressionServiceServer).StreamExpressionsFromServer(m, &expressionServiceStreamExpressionsFromServerServer{stream})
+}
+
+type ExpressionService_StreamExpressionsFromServerServer interface {
+	Send(*ExpressionToSolve) error
+	grpc.ServerStream
+}
+
+type expressionServiceStreamExpressionsFromServerServer struct {
+	grpc.ServerStream
+}
+
+func (x *expressionServiceStreamExpressionsFromServerServer) Send(m *ExpressionToSolve) error {
+	return x.ServerStream.SendMsg(m)
+}
+
 // ExpressionService_ServiceDesc is the grpc.ServiceDesc for ExpressionService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -141,6 +200,12 @@ var ExpressionService_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _ExpressionService_CreateExpression_Handler,
 		},
 	},
-	Streams:  []grpc.StreamDesc{},
+	Streams: []grpc.StreamDesc{
+		{
+			StreamName:    "StreamExpressionsFromServer",
+			Handler:       _ExpressionService_StreamExpressionsFromServer_Handler,
+			ServerStreams: true,
+		},
+	},
 	Metadata: "pkg/proto/calculator.proto",
 }

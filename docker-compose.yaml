@@ -1,4 +1,4 @@
-version: '3.8'
+name: yandex-calculator
 services:
     postgres:
         image: postgres
@@ -8,16 +8,11 @@ services:
             - POSTGRES_PASSWORD=admin
         volumes:
             - ./init-sql:/docker-entrypoint-initdb.d
-        ports:
-            - "5432:5432"
     server:
         build:
             context: ./
             dockerfile: Dockerfile.server
-        restart: on-failure
-        ports:
-            - "50051:50051" # port for gRPC
-            - "8080:8080" # port for HTTP
+        restart: always
         depends_on:
             - postgres
     client:
@@ -36,5 +31,14 @@ services:
             - SUBTRACTION=1
             - GOROUTINES=5
         restart: on-failure
+        depends_on:
+            - server
+    web:
+        build:
+            context: ./
+            dockerfile: Dockerfile.web
+        restart: always
+        ports:
+            - "8080:3000" # port for UI
         depends_on:
             - server

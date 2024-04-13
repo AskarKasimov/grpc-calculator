@@ -1,6 +1,7 @@
+# syntax=docker/dockerfile:1.7-labs
 FROM golang:alpine AS builder
 WORKDIR /app
-COPY / ./
+COPY --exclude=*docker* --exclude=/cmd/web --exclude=/cmd/server / ./
 RUN go build -o ./bin/client ./cmd/client/client.go
 
 FROM alpine

@@ -2,22 +2,13 @@ syntax = "proto3";
 
 package calculatorpc;
 
-import "google/api/annotations.proto";
-
 option go_package = "/pkg/proto";
 
 service ExpressionService {
-   rpc Register (RegisterRequest) returns (RegisterResponse) {
-      option (google.api.http) = {
-         post: "/api/v1/worker/register"
-     };
-   };
-   rpc CreateExpression (CreateExpressionRequest) returns (CreateExpressionResponse)
-   {
-      option (google.api.http) = {
-         post: "/api/v1/expression/add"
-     };
-   };  
+   rpc Register (RegisterRequest) returns (RegisterResponse);
+   rpc CreateExpression (CreateExpressionRequest) returns (CreateExpressionResponse);
+   rpc StreamExpressionsFromServer (ClientAuth) returns (stream ExpressionToSolve);
+   // rpc PromoteAnswersToServer (stream ExpressionSolved) returns ();
 }
 
 message Expression {
@@ -42,4 +33,19 @@ message RegisterRequest {
 
 message RegisterResponse {
    string id = 1;
+}
+
+message ClientAuth {
+   string auth = 1;
+}
+
+message ExpressionToSolve {
+   string id = 1;
+   string vanilla = 2;
+}
+
+message ExpressionSolved {
+   string id = 1;
+   string state = 2;
+   string answer = 3;
 }
